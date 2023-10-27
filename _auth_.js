@@ -1,4 +1,7 @@
+const { single_user_mode } = require('./_variable_');
 function verify_auth(req, res, next) {
+  //if single user mode, skip the session check
+  if (single_user_mode) next();
   if (!req.oidc.isAuthenticated()) return code_403(req, res);
   next();
 }
