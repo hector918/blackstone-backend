@@ -9,7 +9,7 @@ const log_file_remover_timer = setInterval(() => {
 ////main//////////////////////////////////////
 function log_error() {
   const [req, res] = arguments;
-  const payload = Object.values(arguments).slice(3);
+  const payload = Object.values(arguments).slice(2);
   console.error(new Date().toLocaleString(), ...payload);
   log_to_file(req, res, "error", payload);
 }
