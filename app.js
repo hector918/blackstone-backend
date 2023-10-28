@@ -33,24 +33,30 @@ app.use((req, res, next) => {
     log_error(req, res, req.route, serializedError);
   };
   req.on("end", () => log_to_file(req, res));
+  req.general_procedure = general_procedure;
   next();
 })
 //routes///////////////////////////////////////
 app.use('/api/meeting-rooms', verify_auth, require('./controllers/meeting-rooms'));
 app.use('/api/bookings', verify_auth, require('./controllers/bookings'));
 //route explain: /login, /logout, /callback are taken by auth0//
+app.get('/set_first_user_as_admin', async (req, res) => {
+  await general_procedure(req, res, async () => {
+    const ret = await user.set_first_user_as_admin();
+    res.json({ payload: ret });
+  })
+})
 app.get('/is_auth', async (req, res) => {
   await general_procedure(req, res, async () => {
-    let user_profile;
-    if (variable.single_user_mode) {
-      //if single user mode, user profile draw from _variable_.js
-      user_profile = variable.single_user_user_profile
-    } else {
+    if (variable.single_user_mode === false) {
       //if not in single user mode, needs to check user login status
       if (!req.oidc.isAuthenticated()) throw new Error(401);
-      user_profile = req?.oidc?.user;
+    } else {
+      //if single user mode, user profile draw from _variable_.js
+      req.oidc = { user: variable.single_user_user_profile };
     }
     //return user profile
+    let user_profile = req?.oidc?.user;
     res.json({ payload: { user_profile } });
     //update user status to db
     await db_user.register_user_status(user_profile);
@@ -76,7 +82,7 @@ async function general_procedure(req, res, fn) {
     req.log_error(error);
     const message = error_code.message(error.message);
     const code = message !== error.message ? error.message : 500;
-    res.status(code).json({ error: message });
+    res.status(Number(code)).json({ error: message });
   }
 }
 ///export/////////////////////////////////////////////

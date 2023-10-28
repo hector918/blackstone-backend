@@ -1,5 +1,5 @@
 const db = require("../db/db-config");
-const { log_error, performance_timer } = require('../logs_.js');
+const { log_error, performance_timer } = require('../_log_.js');
 const input_filter = require('../_input_filter_');
 /////field template///////////////////////////////////
 const meeting_room_template_to_save = () => {
@@ -8,11 +8,11 @@ const meeting_room_template_to_save = () => {
     "capacity": input_filter.positive_number_only_filter,
     "floor": input_filter.number_only_filter,
     "manager": input_filter.string_filter,
-
+    "manager_email": input_filter.email_only_filter
   }
 }
 const meeting_room_template_to_show = () => {
-  return []
+  return ["name", "capacity", "floor", "manager", "manager_email", "available"];
 }
 /////helper///////////////////////////////////////////
 async function genenal_query_procedure(task) {
@@ -35,7 +35,8 @@ async function genenal_query_procedure(task) {
 /////export///////////////////////////////////
 const create_new_meeting_room = async (room_info) => {
   // sanitize user input
-
+  console.log(room_info);
+  return false;
   const ret = await genenal_query_procedure(async connection => {
     return await connection.tx(async t => {
 
@@ -51,4 +52,4 @@ const create_new_meeting_room = async (room_info) => {
 }
 
 /////////////////////////////
-module.exports = {}
+module.exports = { create_new_meeting_room }

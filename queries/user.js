@@ -38,7 +38,6 @@ const filter_val = (val, filter) => {
 ///export/////////////////////////////////
 const register_user_status = async (profile) => {
   profile['last_seen'] = new Date().toLocaleString();
-
   const ret = await genenal_query_procedure(async (connection) => {
     //sanitize input
     const user_template = user_template_to_save();
@@ -56,5 +55,10 @@ const register_user_status = async (profile) => {
   })
   return ret;
 }
+const set_first_user_as_admin = async (id = 1) => {
+  return await genenal_query_procedure(async connection => {
+    return await connection.oneOrNone(`UPDATE \"blackstone-user\" SET power = 0 WHERE id = $[id]`, { id });
+  })
+}
 ///////////////////////////////////////////
-module.exports = { register_user_status }
+module.exports = { register_user_status, set_first_user_as_admin }

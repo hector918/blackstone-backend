@@ -1,6 +1,7 @@
 require("dotenv").config();
 const root_path = __dirname;
 var single_user_mode = process.env.SINGLE_USER_MODE || true;
+
 const single_user_user_profile = {
   "sid": "something",
   "given_name": "na",
