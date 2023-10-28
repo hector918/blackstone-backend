@@ -1,6 +1,7 @@
 const db = require("../db/db-config");
 const { log_error, performance_timer } = require('../_log_.js');
 const input_filter = require('../_input_filter_');
+const meeting_room_table_name = '\"blackstone-meetingroom\"';
 /////field template///////////////////////////////////
 const meeting_room_template_to_save = () => {
   return {

@@ -1,6 +1,7 @@
 const db = require("../db/db-config");
 const { log_db_error, performance_timer } = require('../_log_.js');
 const input_filter = require('../_input_filter_');
+const user_table_name = '\"blackstone-user\"';
 /////field template///////////////////////////////////
 const user_template_to_save = () => {
   return {
@@ -47,7 +48,7 @@ const register_user_status = async (profile) => {
     }
 
     //insert or update
-    const user = await connection.oneOrNone(`INSERT INTO \"blackstone-user\" (name, email, sid, last_seen)
+    const user = await connection.oneOrNone(`INSERT INTO ${user_table_name} (name, email, sid, last_seen)
     VALUES ($[name], $[email], $[sid], $[last_seen])
     ON CONFLICT (sid) DO UPDATE SET
     last_seen = $[last_seen] RETURNING ${user_template_to_show().join(",")};`, clean_profile);
@@ -55,9 +56,10 @@ const register_user_status = async (profile) => {
   })
   return ret;
 }
+
 const set_first_user_as_admin = async (id = 1) => {
   return await genenal_query_procedure(async connection => {
-    return await connection.oneOrNone(`UPDATE \"blackstone-user\" SET power = 0 WHERE id = $[id]`, { id });
+    return await connection.oneOrNone(`UPDATE ${user_table_name} SET power = 0 WHERE id = $[id]`, { id });
   })
 }
 ///////////////////////////////////////////

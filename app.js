@@ -37,8 +37,10 @@ app.use((req, res, next) => {
   next();
 })
 //routes///////////////////////////////////////
+//controller
 app.use('/api/meeting-rooms', verify_auth, require('./controllers/meeting-rooms'));
 app.use('/api/bookings', verify_auth, require('./controllers/bookings'));
+//base route
 //route explain: /login, /logout, /callback are taken by auth0//
 app.get('/set_first_user_as_admin', async (req, res) => {
   await general_procedure(req, res, async () => {
@@ -62,19 +64,10 @@ app.get('/is_auth', async (req, res) => {
     await db_user.register_user_status(user_profile);
   })
 });
-// app.get('/check_single_user_mode', (req, res) => {
-//   general_procedure(req, res, () => {
-//     res.json({
-//       payload: variable.single_user_mode,
-//       user: variable.single_user_user_profile
-//     });
-//   })
-// })
-//404
 app.get('*', (req, res) => {
   res.status(404).send("file not found.");
 })
-////////////////////////////////////////////////
+///helper///////////////////////////////////////////
 async function general_procedure(req, res, fn) {
   try {
     await fn();

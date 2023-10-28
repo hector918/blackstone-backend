@@ -1,5 +1,6 @@
 const express = require("express");
 const bookings = express.Router();
+const bookings_table_name = '\"blackstone-bookings\"';
 //////////////////////////////////////////////
 bookings.get('/', async (req, res) => {
 
