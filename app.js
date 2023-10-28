@@ -20,8 +20,10 @@ const config = {
 //middle ware//////////////////////////////////
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.static("./public"));
+app.use(express.json({ type: "application/json", limit: variable.json_string_size_limit }));
 app.use(auth(config));
 app.use((req, res, next) => {
+  //preset log function, it logs to file, in /logs folder, check _log_.js for more detail.
   req.log_start_time = new Date().getTime();
   req.log = function () { log(req.route, ...arguments) };
   req.log_error = function (error) {

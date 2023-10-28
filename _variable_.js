@@ -13,10 +13,11 @@ const single_user_user_profile = {
   "email_verified": true,
   "sub": "google-oauth2|1110543040982930844181"
 };
-
+const json_string_size_limit = "1mb";
 /////////////////////////////
 module.exports = {
   root_path,
   single_user_mode,
-  single_user_user_profile
+  single_user_user_profile,
+  json_string_size_limit
 };
