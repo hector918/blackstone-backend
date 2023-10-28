@@ -10,13 +10,13 @@ meeting_rooms.get('/', async (req, res) => {
 
 meeting_rooms.post('/', async (req, res) => {
   //new
-  console.log("heelo")
   await req.general_procedure(req, res, async () => {
     let { name, capacity, floor } = req.body;
+    console.log(req.body)
     const room_info = {
       "name": input_filter.english_letter_space_number_only_tester(name),
-      "capacity": input_filter.positive_number_only_tester(capacity),
-      "floor": input_filter.number_only_tester(floor)
+      "capacity": input_filter.positive_int_only_tester(capacity),
+      "floor": input_filter.int_only_tester(floor)
     };
     for (let key in room_info) if (room_info[key].ret === false) {
       res.json({
@@ -27,8 +27,20 @@ meeting_rooms.post('/', async (req, res) => {
       return;
     }
     //if all good, insert to db
-    await create_new_meeting_room({ name, capacity, floor, });
-    res.send("123")
+    const user_profile = req.oidc.user;
+    const ret = await create_new_meeting_room({ name, capacity, floor, manager: user_profile.sid, manager_email: user_profile.email });
+    if (ret.error) {
+      res.json({
+        error: ret.error.message, detail: {
+          summary: {
+            ret: false,
+            explain: ret.error.message
+          }
+        }
+      });
+    } else {
+      res.json({ payload: ret });
+    }
   })
 
 });

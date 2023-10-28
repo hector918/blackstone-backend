@@ -41,7 +41,7 @@ function log_to_file(req, res, type = "request", message) {
     date: d.toLocaleString(),
     method: req?.method || undefined,
     lapse: req ? d.getTime() - req[time_lapse_key_name] : undefined,
-    ip: req !== undefined ? `${req.socket.remoteAddress}:${req.socket.remotePort}` : undefined,
+    ip: req !== undefined ? `${req.socket?.remoteAddress}:${req.socket?.remotePort}` : undefined,
     statusCode: res?.statusCode || undefined,
     url: req?.url || undefined,
     message

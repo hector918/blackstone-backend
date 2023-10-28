@@ -6,8 +6,8 @@ const meeting_room_table_name = '\"blackstone-meetingroom\"';
 const meeting_room_template_to_save = () => {
   return {
     "name": input_filter.english_letter_space_number_only_filter,
-    "capacity": input_filter.positive_number_only_filter,
-    "floor": input_filter.number_only_filter,
+    "capacity": input_filter.positive_int_only_filter,
+    "floor": input_filter.int_only_filter,
     "manager": input_filter.string_filter,
     "manager_email": input_filter.email_only_filter
   }
@@ -22,35 +22,44 @@ async function genenal_query_procedure(task) {
   const connection = await db.connect();
   try {
     pt.add_tick("start task");
-    const ret = task(connection, pt);
+    const ret = await task(connection, pt);
     pt.add_tick("end task");
     return ret;
   } catch (error) {
     log_error(error);
-    return false;
+    return { error };
   } finally {
     pt.done();
     if (connection) connection.done();
   }
 }
+async function check_for_duplicate_room(connection, room_info) {
+  return await connection.oneOrNone(`SELECT id FROM ${meeting_room_table_name} WHERE floor = $[floor] and name = trim($[name])`, room_info);
+}
 /////export///////////////////////////////////
 const create_new_meeting_room = async (room_info) => {
-  // sanitize user input
-  console.log(room_info);
-  return false;
-  const ret = await genenal_query_procedure(async connection => {
+  return await genenal_query_procedure(async (connection, pt) => {
+    // sanitize user input
+    const room_template = meeting_room_template_to_save();
+    const clean_room_info = {};
+    for (let key in room_template) clean_room_info[key] = input_filter.filter_val(room_info[key], room_template[key]);
+    //build up transition
     return await connection.tx(async t => {
 
-      const detail_ret = await t.manyOrNone(`SELECT ${Object.keys(happen_detail_template_to_show_()).join(",")} FROM happen_detail WHERE id in ('${id_array.join("','")}')`);
+      pt.add_tick("checking duplicate room");
+      const is_duplicate = await check_for_duplicate_room(t, clean_room_info);
+      if (is_duplicate !== null) throw new Error('duplicate room name at same floor.');
 
-      if (detail_ret === false) return false;
-      const images_ret = await t.manyOrNone(`SELECT ${Object.keys(detail_image_template_to_show_()).join(",")} FROM happen_detail_images WHERE happen_detail_id in ('${id_array.join("','")}')`);
-
-      return { detail_ret, images_ret };
+      pt.add_tick("inserting roominfo into table");
+      return await t.oneOrNone(`INSERT INTO ${meeting_room_table_name} 
+      (${Object.keys(room_template).join(",")}) 
+      VALUES ($[${Object.keys(room_template).join("],$[")}]) 
+      RETURNING ${meeting_room_template_to_show().join(",")}`, clean_room_info);
     })
   })
-  return ret;
 }
+
+
 
 /////////////////////////////
 module.exports = { create_new_meeting_room }

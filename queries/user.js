@@ -26,16 +26,13 @@ async function genenal_query_procedure(task) {
     return ret;
   } catch (error) {
     log_db_error(error);
-    return error.message;
+    return { error };
   } finally {
     pt.done();
     if (connection) connection.done();
   }
 }
-const filter_val = (val, filter) => {
-  if (filter) return filter(val);
-  return null;
-}
+
 ///export/////////////////////////////////
 const register_user_status = async (profile) => {
   profile['last_seen'] = new Date().toLocaleString();
@@ -43,8 +40,8 @@ const register_user_status = async (profile) => {
     //sanitize input
     const user_template = user_template_to_save();
     const clean_profile = {};
-    for (let key in user_template) if (profile[key] !== undefined) {
-      clean_profile[key] = filter_val(profile[key], user_template[key]);
+    for (let key in user_template) {
+      clean_profile[key] = input_filter.filter_val(profile[key], user_template[key]);
     }
 
     //insert or update
