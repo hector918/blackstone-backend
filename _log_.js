@@ -1,27 +1,30 @@
 const fs = require('fs');
-var debug_mode = true;
+var debug_mode = 1;
 const log_file_dir = __dirname + "/logs/";
-const log_file_expire_limit = 86_400_000 * 1;// 86400000 = 1 day
+const log_file_expire_limit = 7;// unit day
 const time_lapse_key_name = "log_start_time";
 const log_file_remover_timer = setInterval(() => {
   remove_out_date_files();
-}, (60 * 1000 * 60 * 12))
+}, (1000 * 60 * 60) * 12);//12 hours check once
 ////main//////////////////////////////////////
 function log_error() {
   const [req, res] = arguments;
   const payload = Object.values(arguments).slice(2);
   console.error(new Date().toLocaleString(), ...payload);
-  log_to_file(req, res, "error", payload);
+  if (debug_mode === 1) log_to_file(req, res, "error", payload);
 }
 function log() {
   console.log(new Date().toLocaleString(), ...arguments);
 }
-
+function log_db_error() {
+  console.error(new Date().toLocaleString(), ...arguments);
+  if (debug_mode === 1) log_to_file(undefined, undefined, "db-error", arguments);
+}
 const remove_out_date_files = () => {
-  let current_time = new Date().getTime();
   fs.readdir(log_file_dir, (err, files) => {
     if (err) return;
     for (let file of files) {
+      let current_time = new Date().getTime();
       let time_diff = (current_time - new Date(file.split("-", 3).join("-")).getTime()) / 86400000;
       if (time_diff > log_file_expire_limit) {
         fs.unlink(`${log_file_dir}${file}`, (err) => {
@@ -36,11 +39,11 @@ function log_to_file(req, res, type = "request", message) {
   let d = new Date();
   let content = {
     date: d.toLocaleString(),
-    method: req.method,
-    lapse: d.getTime() - req[time_lapse_key_name],
-    ip: `${req.socket.remoteAddress}:${req.socket.remotePort}`,
-    statusCode: res.statusCode,
-    url: req.url,
+    method: req?.method || undefined,
+    lapse: req ? d.getTime() - req[time_lapse_key_name] : undefined,
+    ip: req !== undefined ? `${req.socket.remoteAddress}:${req.socket.remotePort}` : undefined,
+    statusCode: res?.statusCode || undefined,
+    url: req?.url || undefined,
     message
   }
   fs.writeFile(`${log_file_dir}${get_date(d)}-${type}_log.txt`, JSON.stringify(content) + ",\r\n", { 'flag': 'a' }, writeFile_error_ENOENT);
@@ -60,33 +63,34 @@ function get_date(d) {
 ///class///////////////////////////////////////
 class performance_timer {
   constructor() {
-    if (!debug_mode) return;
+    if (debug_mode === 0) return;
     this.start_time = process.uptime();
     this.checkpoint = [];
   }
   add_tick(tick_name) {
-    if (!debug_mode) return;
+    if (debug_mode === 0) return;
     this.checkpoint.push({
       name: tick_name,
       time: (process.uptime() - this.start_time + " - seconds")
     })
   }
   done() {
-    if (!debug_mode) return;
+    if (debug_mode === 0) return;
     this.add_tick("ending");
     console.log(this.checkpoint);
   }
 }
 ////mode switcher//////////////////////////////////////
-function set_debug_mode(bool) {
-  debug_mode = bool;
+function set_log_mode(int) {
+  debug_mode = int;
 }
 ///export///////////////////////////////////////
 module.exports = {
   log_error,
   log,
+  log_db_error,
   performance_timer,
-  set_debug_mode,
+  set_log_mode,
   log_to_file,
   time_lapse_key_name
 };
