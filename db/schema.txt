@@ -5,13 +5,15 @@
 
 CREATE TABLE "blackstone-bookings" (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    "meetingName" text,
-    "meetingRoomId" integer,
-    "startDate" timestamp without time zone,
-    "endDate" timestamp without time zone,
-    attendees text,
+    meeting_name text,
+    meeting_room_id integer,
+    start_date timestamp without time zone,
+    end_date timestamp without time zone,
     host text,
-    host_email text
+    host_email text,
+    timestamp timestamp without time zone,
+    attendees json DEFAULT '{}'::json,
+    status integer DEFAULT 0
 );
 
 -- Indices -------------------------------------------------------

@@ -46,6 +46,12 @@ function start_date_tester(datetime, constraint = 30) {
     constraint
   }
 }
+function start_date_filter(start_date) {
+  return new Date(start_date);
+}
+function end_date_filter(end_date) {
+  return new Date(end_date);
+}
 function end_date_tester(start_date, end_date, constraint = 30) {
   const ret = isDateInRange(new Date(end_date), new Date(start_date), getFutureDate(constraint));
   return {
@@ -58,7 +64,13 @@ function email_list_only_tester(emails) {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   let ret = true;
   for (let email of emails) ret &= emailRegex.test(email);
-  return { ret, explain: "email address only." }
+  return { ret: ret == 1, explain: "email address only." }
+}
+function email_list_only_filter(emails) {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const ret = [];
+  for (let email of emails) if (emailRegex.test(email)) ret.push(email);
+  return ret;
 }
 const filter_val = (val, filter) => {
   if (val === undefined) throw new Error("The input value does not match our map.")
@@ -86,7 +98,10 @@ module.exports = {
   email_only_filter,
   string_filter,
   start_date_tester,
+  start_date_filter,
   end_date_tester,
+  end_date_filter,
   email_list_only_tester,
+  email_list_only_filter,
   filter_val
 }

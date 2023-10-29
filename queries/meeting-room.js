@@ -17,7 +17,7 @@ const meeting_room_template_to_show = () => {
 }
 /////helper///////////////////////////////////////////
 async function genenal_query_procedure(task) {
-  const pt = new performance_timer(`event - ${task.toString()}`);
+  const pt = new performance_timer(`event - ${task.name}`);
   //draw an connection from the pool
   const connection = await db.connect();
   try {

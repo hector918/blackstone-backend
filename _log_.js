@@ -62,16 +62,16 @@ function get_date(d) {
 }
 ///class///////////////////////////////////////
 class performance_timer {
-  constructor() {
+  constructor(function_info) {
     if (debug_mode === 0) return;
     this.start_time = process.uptime();
-    this.checkpoint = [];
+    this.checkpoint = [`performance timer -${function_info}- time unit - seconds`];
   }
   add_tick(tick_name) {
     if (debug_mode === 0) return;
     this.checkpoint.push({
       name: tick_name,
-      time: (process.uptime() - this.start_time + " - seconds")
+      time: (process.uptime() - this.start_time)
     })
   }
   done() {
