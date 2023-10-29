@@ -15,10 +15,13 @@ const single_user_user_profile = {
   "sub": "google-oauth2|1110543040982930844181"
 };
 const json_string_size_limit = "1mb";
+
+const booking_datetime_constraint = 30;
 /////////////////////////////
 module.exports = {
   root_path,
   single_user_mode,
   single_user_user_profile,
-  json_string_size_limit
+  json_string_size_limit,
+  booking_datetime_constraint
 };

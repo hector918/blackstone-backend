@@ -13,7 +13,7 @@ const meeting_room_template_to_save = () => {
   }
 }
 const meeting_room_template_to_show = () => {
-  return ["name", "capacity", "floor", "manager", "manager_email", "available"];
+  return ["id", "name", "capacity", "floor", "manager", "manager_email", "available"];
 }
 /////helper///////////////////////////////////////////
 async function genenal_query_procedure(task) {
@@ -59,7 +59,24 @@ const create_new_meeting_room = async (room_info) => {
   })
 }
 
+const get_all_meeting_rooms = async () => {
+  return await genenal_query_procedure(async (connection) => {
+    return await connection.many(`SELECT ${meeting_room_template_to_show().join(",")} FROM ${meeting_room_table_name};`);
+  })
+}
 
+const get_room_detail_by_id = async (id) => {
+  return await genenal_query_procedure(async (connection, pt) => {
+    //build up transition
+    return await connection.tx(async t => {
+      const room = await t.oneOrNone(`SELECT ${meeting_room_template_to_show().join(",")} FROM ${meeting_room_table_name} WHERE id=$[id];`, { id });
+      pt.add_tick(`query room by ${id}`);
+      if (room !== null) {
+        return { room };
+      } else return { error: "room not found." }
+    });
+  })
+}
 
 /////////////////////////////
-module.exports = { create_new_meeting_room }
+module.exports = { create_new_meeting_room, get_all_meeting_rooms, get_room_detail_by_id }

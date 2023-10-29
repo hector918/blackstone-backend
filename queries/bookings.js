@@ -1,0 +1,1 @@
+const bookings_table_name = '\"blackstone-bookings\"';
