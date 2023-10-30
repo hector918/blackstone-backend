@@ -1,7 +1,7 @@
-const db = require("../db/db-config");
+const { db, table_name } = require("../db/db-config");
 const { log_db_error, performance_timer } = require('../_log_.js');
 const input_filter = require('../_input_filter_');
-const user_table_name = '\"blackstone-user\"';
+const { user_table_name } = table_name;
 /////field template///////////////////////////////////
 const user_template_to_save = () => {
   return {

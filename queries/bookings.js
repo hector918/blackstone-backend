@@ -1,7 +1,8 @@
-const db = require("../db/db-config");
+const { db, table_name } = require("../db/db-config");
 const { log_error, performance_timer } = require('../_log_.js');
 const input_filter = require('../_input_filter_');
-const bookings_table_name = '\"blackstone-bookings\"';
+const { bookings_table_name } = table_name;
+const { get_meeting_rooms_by_ids_t } = require('./meeting-room');
 /////field template///////////////////////////////////
 const booking_template_to_save = () => {
   return {
@@ -39,9 +40,11 @@ async function genenal_query_procedure(task) {
 async function query_for_overlap_booking_t(booking, t) {
   return await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE meeting_room_id = $[meeting_room_id] AND (start_date, end_date) OVERLAPS ($[start_date], $[end_date]) AND status = 0;`, booking);
 }
-async function get_future_bookings_with_room_id_t(meeting_room_id, t) {
-  return await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE meeting_room_id = $[meeting_room_id] AND start_date > CURRENT_DATE AND end_date > CURRENT_DATE AND status = 0 ORDER BY start_date;`, { meeting_room_id });
+async function get_future_bookings_with_room_id_t(meeting_room_id = undefined, t) {
+  const where = meeting_room_id !== undefined ? `meeting_room_id = $[meeting_room_id] AND` : "";
+  return await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE ${where} start_date > CURRENT_DATE AND end_date > CURRENT_DATE AND status = 0 ORDER BY start_date;`, { meeting_room_id });
 }
+
 async function mark_booking_delete(booking_id, t) {
   return await t.oneOrNone(`UPDATE `);
 }
@@ -81,10 +84,20 @@ const book_an_room = async (form) => {
 
 const get_future_bookings_by_meeting_room_id = async (meeting_room_id) => {
   return await genenal_query_procedure(async (connection, pt) => {
-    const ret = await get_future_bookings_with_room_id_t(meeting_room_id, connection);
-    console.log(ret);
-    return ret;
+    pt.add_tick("get bookings");
+    return await get_future_bookings_with_room_id_t(meeting_room_id, connection);
+  })
+}
+
+const get_all_future_bookings_on_all_rooms = async () => {
+  return await genenal_query_procedure(async (connection, pt) => {
+    return await connection.tx(async t => {
+      const bookings = await get_future_bookings_with_room_id_t(undefined, connection);
+      const room_list = bookings.map(el => `'${el.meeting_room_id}'`);
+      const rooms = await get_meeting_rooms_by_ids_t(room_list, t);
+      return { bookings, rooms };
+    })
   })
 }
 /////////////////////////////
-module.exports = { book_an_room, get_future_bookings_by_meeting_room_id, bookings_table_name }
+module.exports = { book_an_room, get_future_bookings_by_meeting_room_id, get_all_future_bookings_on_all_rooms, bookings_table_name }

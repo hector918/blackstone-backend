@@ -2,10 +2,22 @@ const express = require("express");
 const bookings = express.Router();
 const input_filter = require('../_input_filter_');
 const variable = require('../_variable_');
-const { book_an_room } = require('../queries/bookings');
+const { book_an_room, get_all_future_bookings_on_all_rooms } = require('../queries/bookings');
 //////////////////////////////////////////////
 bookings.get('/', async (req, res) => {
+  //list all future booking
+  const ret = await get_all_future_bookings_on_all_rooms();
+  console.log(ret);
+  if (ret.error) {
+    res.json({ error: error.message });
+  } else {
+    res.json({ payload: ret });
+  }
+})
 
+bookings.get("/:id", async (req, res) => {
+  //retrieve a booking by id
+  res.send("under construction");
 })
 
 bookings.post('/', async (req, res) => {
@@ -40,7 +52,6 @@ bookings.post('/', async (req, res) => {
       meeting_room_id: meetingRoomId
     });
     //insert into db
-    console.log(ret)
     if (ret.error !== undefined) {
       //error occurred 
       res.json({ error: ret.error });
@@ -51,6 +62,11 @@ bookings.post('/', async (req, res) => {
       res.json({ payload: ret });
     }
   })
+})
+
+bookings.delete("/:id", async (req, res) => {
+  //cancel a booking by id
+  res.send("under construction");
 })
 //////////////////////////////////////////////
 

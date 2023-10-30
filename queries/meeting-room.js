@@ -1,8 +1,7 @@
-const db = require("../db/db-config");
+const { db, table_name } = require("../db/db-config");
 const { log_error, performance_timer } = require('../_log_.js');
 const input_filter = require('../_input_filter_');
-const meeting_room_table_name = '\"blackstone-meetingroom\"';
-const { bookings_table_name } = require('./bookings');
+const { meeting_room_table_name, bookings_table_name } = table_name;
 /////field template///////////////////////////////////
 const meeting_room_template_to_save = () => {
   return {
@@ -76,6 +75,10 @@ const get_all_meeting_rooms = async () => {
   })
 }
 
+const get_meeting_rooms_by_ids_t = async (ids, t) => {
+  return await t.manyOrNone(`SELECT ${meeting_room_template_to_show().join(",")} FROM ${meeting_room_table_name} WHERE id in (${ids.join(",")});`)
+}
+
 const get_room_detail_by_id = async (id) => {
   return await genenal_query_procedure(async (connection, pt) => {
     //build up transition
@@ -126,4 +129,4 @@ const search_available_room = async (form) => {
   })
 }
 /////////////////////////////
-module.exports = { create_new_meeting_room, get_all_meeting_rooms, get_room_detail_by_id, search_available_room }
+module.exports = { create_new_meeting_room, get_all_meeting_rooms, get_room_detail_by_id, search_available_room, get_meeting_rooms_by_ids_t }

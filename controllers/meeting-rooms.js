@@ -6,7 +6,7 @@ const booking = require('../queries/bookings');
 const { error } = require("console");
 //////////////////////////////////////////////
 meeting_rooms.get('/', async (req, res) => {
-  //get all rooms
+  //list all meeting rooms
   await req.general_procedure(req, res, async () => {
     const ret = await get_all_meeting_rooms();
     if (ret.error) {
@@ -17,64 +17,8 @@ meeting_rooms.get('/', async (req, res) => {
   })
 });
 
-meeting_rooms.get('/search_rooms', async (req, res) => {
-  //search available room
-  const { startDate, endDate, capacity, capacityOp, floor, floorOp } = req.query;
-  await req.general_procedure(req, res, async () => {
-    //validation
-    const form = {};
-    if (input_filter.start_date_tester(startDate).ret === true) form["start_date"] = startDate;
-    if (input_filter.start_date_tester(endDate).ret === true) form["end_date"] = endDate;
-    if (input_filter.positive_int_only_tester(capacity).ret === true) {
-      form['capacity'] = capacity;
-      form['capacityOp'] = input_filter.operater_filter(capacityOp);
-    }
-    if (input_filter.int_only_tester(floor).ret === true) {
-      form['floor'] = floor;
-      form['floorOp'] = input_filter.operater_filter(floorOp);
-    }
-    const ret = await search_available_room(form);
-    if (ret.error) {
-      throw new Error(ret.error.message);
-    } else {
-      res.json({ payload: ret });
-    }
-  })
-});
-
-meeting_rooms.get('/:id/bookings', async (req, res) => {
-  const { id: meeting_room_id } = req.params;
-  console.log(meeting_room_id);
-  await req.general_procedure(req, res, async () => {
-    //
-    const vaildation = input_filter.positive_int_only_tester(meeting_room_id);
-    console.log(vaildation);
-    if (vaildation.ret === false) {
-      res.json({ error: vaildation.explain });
-    } else {
-      const ret = await booking.get_future_bookings_by_meeting_room_id(meeting_room_id);
-      if (ret.error !== undefined) throw new Error(error.message);
-      res.json({ payload: ret });
-    }
-
-  })
-})
-
-meeting_rooms.get('/:id', async (req, res) => {
-  //get room by id
-  const { id } = req.params;
-  if (!input_filter.positive_int_only_tester(id)) {
-    throw new Error(400);
-  }
-  await req.general_procedure(req, res, async () => {
-    const { room, error } = await get_room_detail_by_id(id);
-    if (error !== undefined) throw new Error(error);
-    res.json({ payload: { room } });
-  })
-});
-
 meeting_rooms.post('/', async (req, res) => {
-  //new
+  //create a meeting room 
   await req.general_procedure(req, res, async () => {
     let { name, capacity, floor } = req.body;
     //input validation
@@ -109,5 +53,61 @@ meeting_rooms.post('/', async (req, res) => {
   })
 
 });
+
+meeting_rooms.get('/:id', async (req, res) => {
+  //get room by id
+  const { id } = req.params;
+  if (!input_filter.positive_int_only_tester(id)) {
+    throw new Error(400);
+  }
+  await req.general_procedure(req, res, async () => {
+    const { room, error } = await get_room_detail_by_id(id);
+    if (error !== undefined) throw new Error(error);
+    res.json({ payload: { room } });
+  })
+});
+
+meeting_rooms.get('/:id/bookings', async (req, res) => {
+  const { id: meeting_room_id } = req.params;
+  await req.general_procedure(req, res, async () => {
+    //
+    const vaildation = input_filter.positive_int_only_tester(meeting_room_id);
+    if (vaildation.ret === false) {
+      res.json({ error: vaildation.explain });
+    } else {
+      const ret = await booking.get_future_bookings_by_meeting_room_id(meeting_room_id);
+      if (ret.error !== undefined) throw new Error(error.message);
+      res.json({ payload: ret });
+    }
+
+  })
+})
+
+meeting_rooms.post('/available', async (req, res) => {
+  //search available room
+  const { startDate, endDate, capacity, capacityOp, floor, floorOp } = req.body;
+  await req.general_procedure(req, res, async () => {
+    //validation
+    const form = {};
+    if (input_filter.start_date_tester(startDate).ret === true) form["start_date"] = startDate;
+    if (input_filter.start_date_tester(endDate).ret === true) form["end_date"] = endDate;
+    if (input_filter.positive_int_only_tester(capacity).ret === true) {
+      form['capacity'] = capacity;
+      form['capacityOp'] = input_filter.operater_filter(capacityOp);
+    }
+    if (input_filter.int_only_tester(floor).ret === true) {
+      form['floor'] = floor;
+      form['floorOp'] = input_filter.operater_filter(floorOp);
+    }
+    const ret = await search_available_room(form);
+    if (ret.error) {
+      throw new Error(ret.error.message);
+    } else {
+      res.json({ payload: ret });
+    }
+  })
+});
+
+
 //////////////////////////////////////////////
 module.exports = meeting_rooms;

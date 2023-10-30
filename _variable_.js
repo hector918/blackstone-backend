@@ -17,6 +17,7 @@ const single_user_user_profile = {
 const json_string_size_limit = "1mb";
 
 const booking_datetime_constraint = 30;
+
 /////////////////////////////
 module.exports = {
   root_path,
