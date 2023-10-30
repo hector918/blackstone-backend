@@ -1,7 +1,7 @@
 const express = require("express");
 const meeting_rooms = express.Router();
 const input_filter = require('../_input_filter_');
-const { create_new_meeting_room, get_all_meeting_rooms, get_room_detail_by_id } = require('../queries/meeting-room');
+const { create_new_meeting_room, get_all_meeting_rooms, get_room_detail_by_id, search_available_room } = require('../queries/meeting-room');
 const booking = require('../queries/bookings');
 const { error } = require("console");
 //////////////////////////////////////////////
@@ -11,6 +11,31 @@ meeting_rooms.get('/', async (req, res) => {
     const ret = await get_all_meeting_rooms();
     if (ret.error) {
       res.json({ error: ret.error });
+    } else {
+      res.json({ payload: ret });
+    }
+  })
+});
+
+meeting_rooms.get('/search_rooms', async (req, res) => {
+  //search available room
+  const { startDate, endDate, capacity, capacityOp, floor, floorOp } = req.query;
+  await req.general_procedure(req, res, async () => {
+    //validation
+    const form = {};
+    if (input_filter.start_date_tester(startDate).ret === true) form["start_date"] = startDate;
+    if (input_filter.start_date_tester(endDate).ret === true) form["end_date"] = endDate;
+    if (input_filter.positive_int_only_tester(capacity).ret === true) {
+      form['capacity'] = capacity;
+      form['capacityOp'] = input_filter.operater_filter(capacityOp);
+    }
+    if (input_filter.int_only_tester(floor).ret === true) {
+      form['floor'] = floor;
+      form['floorOp'] = input_filter.operater_filter(floorOp);
+    }
+    const ret = await search_available_room(form);
+    if (ret.error) {
+      throw new Error(ret.error.message);
     } else {
       res.json({ payload: ret });
     }

@@ -87,4 +87,4 @@ const get_future_bookings_by_meeting_room_id = async (meeting_room_id) => {
   })
 }
 /////////////////////////////
-module.exports = { book_an_room, get_future_bookings_by_meeting_room_id }
+module.exports = { book_an_room, get_future_bookings_by_meeting_room_id, bookings_table_name }
