@@ -12,11 +12,11 @@ const user_template_to_save = () => {
   }
 }
 const user_template_to_show = () => {
-  return ["name", "email", "sid"];
+  return ["name", "email", "sid", "power"];
 }
 /////helper///////////////////////////////////////////
 async function genenal_query_procedure(task) {
-  const pt = new performance_timer(`event - ${task.toString()}`);
+  const pt = new performance_timer(`event - ${task}`);
   //draw an connection from the pool
   const connection = await db.connect();
   try {
@@ -59,5 +59,11 @@ const set_first_user_as_admin = async (id = 1) => {
     return await connection.oneOrNone(`UPDATE ${user_table_name} SET power = 0 WHERE id = $[id]`, { id });
   })
 }
+
+const get_user_info_by_sid = async (sid) => {
+  return await genenal_query_procedure(async connection => {
+    return await connection.oneOrNone(`SELECT ${user_template_to_show().join(",")} FROM ${user_table_name} WHERE sid = $[sid] AND available = 0`, { sid });
+  })
+}
 ///////////////////////////////////////////
-module.exports = { register_user_status, set_first_user_as_admin }
+module.exports = { register_user_status, set_first_user_as_admin, get_user_info_by_sid }

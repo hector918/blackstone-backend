@@ -2,12 +2,11 @@ const express = require("express");
 const bookings = express.Router();
 const input_filter = require('../_input_filter_');
 const variable = require('../_variable_');
-const { book_an_room, get_all_future_bookings_on_all_rooms } = require('../queries/bookings');
+const { book_an_room, get_all_future_bookings_on_all_rooms, get_booking_by_ids, mark_booking_delete } = require('../queries/bookings');
 //////////////////////////////////////////////
 bookings.get('/', async (req, res) => {
   //list all future booking
   const ret = await get_all_future_bookings_on_all_rooms();
-  console.log(ret);
   if (ret.error) {
     res.json({ error: error.message });
   } else {
@@ -17,7 +16,19 @@ bookings.get('/', async (req, res) => {
 
 bookings.get("/:id", async (req, res) => {
   //retrieve a booking by id
-  res.send("under construction");
+  const { id } = req.params;
+  console.log(id)
+  await req.general_procedure(req, res, async () => {
+    //validation
+    const validation = input_filter.positive_int_only_tester(id);
+    if (validation.ret === false) throw new Error(400);
+    const { bookings, rooms, error } = await get_booking_by_ids([id]);
+    if (error !== undefined) throw new Error(error.message);
+    //re Organized data
+    const ret = { ...bookings[0], roomInfo: rooms[0] };
+    res.json({ payload: ret });
+  })
+
 })
 
 bookings.post('/', async (req, res) => {
@@ -66,7 +77,10 @@ bookings.post('/', async (req, res) => {
 
 bookings.delete("/:id", async (req, res) => {
   //cancel a booking by id
-  res.send("under construction");
+  const { id: booking_id } = req.params;
+  const ret = await mark_booking_delete(booking_id, req.oidc.user);
+  if (ret.error) throw new Error(res.error);
+  res.json({ payload: ret.id });
 })
 //////////////////////////////////////////////
 

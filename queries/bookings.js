@@ -1,7 +1,7 @@
 const { db, table_name } = require("../db/db-config");
 const { log_error, performance_timer } = require('../_log_.js');
 const input_filter = require('../_input_filter_');
-const { bookings_table_name } = table_name;
+const { bookings_table_name, user_table_name } = table_name;
 const { get_meeting_rooms_by_ids_t } = require('./meeting-room');
 /////field template///////////////////////////////////
 const booking_template_to_save = () => {
@@ -21,7 +21,7 @@ const booking_template_to_show = () => {
 }
 /////helper///////////////////////////////////////////
 async function genenal_query_procedure(task) {
-  const pt = new performance_timer(`event - ${task.name}`);
+  const pt = new performance_timer(`event - ${task}`);
   //draw an connection from the pool
   const connection = await db.connect();
   try {
@@ -42,12 +42,11 @@ async function query_for_overlap_booking_t(booking, t) {
 }
 async function get_future_bookings_with_room_id_t(meeting_room_id = undefined, t) {
   const where = meeting_room_id !== undefined ? `meeting_room_id = $[meeting_room_id] AND` : "";
-  return await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE ${where} start_date > CURRENT_DATE AND end_date > CURRENT_DATE AND status = 0 ORDER BY start_date;`, { meeting_room_id });
+  //if use CURRENT_TIMESTAMP will count datetime, if use CURRENT_DATE will count for today, including the passed of today
+  return await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE ${where} start_date > CURRENT_TIMESTAMP AND end_date > CURRENT_TIMESTAMP AND status = 0 ORDER BY start_date;`, { meeting_room_id });
 }
 
-async function mark_booking_delete(booking_id, t) {
-  return await t.oneOrNone(`UPDATE `);
-}
+
 /////export///////////////////////////////////
 const book_an_room = async (form) => {
   form.timestamp = new Date().toLocaleString();
@@ -65,16 +64,17 @@ const book_an_room = async (form) => {
       if (is_overlap.length > 0) return { is_overlap };
       pt.add_tick("insert into table");
       //insert into table
-      const ret = await t.oneOrNone(`INSERT INTO 
+      const added = await t.oneOrNone(`INSERT INTO 
       ${bookings_table_name} 
       (${Object.keys(booking_template).join(",")})
       VALUES ($[${Object.keys(booking_template).join("],$[")}]) 
       RETURNING ${booking_template_to_show().join(",")}`, clean_booking);
-      if (ret.id) {
+      if (added.id) {
         //return all future booking about this room, if runs normal the function ends here
         pt.add_tick("draw booking by id");
 
-        return await get_future_bookings_with_room_id_t(clean_booking.meeting_room_id, t);
+        const bookings = await get_future_bookings_with_room_id_t(clean_booking.meeting_room_id, t);
+        return { added, bookings };
       }
       //if error, undo the transition
       throw new Error(`unknown error happen in booking an room. call admin.<br>form example<br>${JSON.stringify(form)}`)
@@ -99,5 +99,25 @@ const get_all_future_bookings_on_all_rooms = async () => {
     })
   })
 }
+
+const get_booking_by_ids = async (ids) => {
+  return await genenal_query_procedure(async (connection, pt) => {
+    return await connection.tx(async t => {
+      const clean_ids = ids.map(n => input_filter.filter_val(n, input_filter.positive_int_only_filter));
+      const bookings = await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE id in (${clean_ids.join(',')}) AND status = 0;`);
+      const room_list = bookings.map(el => `'${el.meeting_room_id}'`);
+      const rooms = await get_meeting_rooms_by_ids_t(room_list, t);
+      return { bookings, rooms };
+    })
+
+  })
+}
+async function mark_booking_delete(booking_id, user) {
+  console.log("['sid']", user)
+  return await genenal_query_procedure(async (connection, pt) => {
+    const clean_booking_id = input_filter.filter_val(booking_id, input_filter.positive_int_only_filter);
+    return await connection.oneOrNone(`UPDATE ${bookings_table_name} SET status = 2 WHERE id = $[booking_id] AND host = $[sid] AND (SELECT power FROM ${user_table_name} WHERE sid = $[sid]) = 0 RETURNING ${booking_template_to_show().join(',')};`, { "booking_id": clean_booking_id, "sid": user.sid });
+  })
+}
 /////////////////////////////
-module.exports = { book_an_room, get_future_bookings_by_meeting_room_id, get_all_future_bookings_on_all_rooms, bookings_table_name }
+module.exports = { book_an_room, get_future_bookings_by_meeting_room_id, get_all_future_bookings_on_all_rooms, get_booking_by_ids, mark_booking_delete }

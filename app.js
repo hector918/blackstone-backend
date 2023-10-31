@@ -1,7 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const { auth } = require('express-openid-connect');
-require("dotenv").config();
 const cors = require("cors");
 const { verify_auth, get_user_profile } = require('./_auth_');
 const { log_error, log, set_log_mode, time_lapse_key_name, log_to_file } = require('./_log_');
@@ -15,7 +15,7 @@ const config = {
   authRequired: false,
   auth0Logout: true,
   secret: process.env.AUTH_SECRET,
-  baseURL: 'https://localhost:3001',
+  baseURL: process.env.AUTH0_BASEURL,
   clientID: 'n4AbKZtipsZqrYoJCgeNNfaTpdZmwECK',
   issuerBaseURL: 'https://dev-2rc87pi2gm2ieibf.us.auth0.com'
 };
@@ -42,6 +42,10 @@ app.use('/api/meeting-rooms', verify_auth, require('./controllers/meeting-rooms'
 app.use('/api/bookings', verify_auth, require('./controllers/bookings'));
 //base route
 //route explain: /login, /logout, /callback are taken by auth0//
+app.use('/callback', async (req, res, next) => {
+  console.log("in callback", req.oidc);
+  next();
+})
 app.get('/set_first_user_as_admin', async (req, res) => {
   await general_procedure(req, res, async () => {
     const ret = await user.set_first_user_as_admin();
@@ -50,15 +54,18 @@ app.get('/set_first_user_as_admin', async (req, res) => {
 })
 app.get('/is_auth', async (req, res) => {
   await general_procedure(req, res, async () => {
-    if (variable.single_user_mode === false) {
+    if (variable.single_user_mode === "false") {
       //if not in single user mode, needs to check user login status
-      if (!req.oidc.isAuthenticated()) throw new Error(401);
-    } else {
+      if (req.oidc.isAuthenticated() === false) throw new Error(401);
+    } else if (variable.single_user_mode === "true") {
       //if single user mode, user profile draw from _variable_.js
       req.oidc = { user: variable.single_user_user_profile };
+    } else {
+      req.log("in is auth path, unhandle event");
     }
     //return user profile
     let user_profile = req?.oidc?.user;
+    user_profile.from_db = await db_user.get_user_info_by_sid(req.oidc.user.sid);
     res.json({ payload: { user_profile } });
     //update user status to db
     await db_user.register_user_status(user_profile);

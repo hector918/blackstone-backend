@@ -11,14 +11,14 @@ function log_error() {
   const [req, res] = arguments;
   const payload = Object.values(arguments).slice(2);
   console.error(new Date().toLocaleString(), ...payload);
-  if (debug_mode === 1) log_to_file(req, res, "error", payload);
+  if (debug_mode >= 1) log_to_file(req, res, "error", payload);
 }
 function log() {
   console.log(new Date().toLocaleString(), ...arguments);
 }
 function log_db_error() {
   console.error(new Date().toLocaleString(), ...arguments);
-  if (debug_mode === 1) log_to_file(undefined, undefined, "db-error", arguments);
+  if (debug_mode >= 1) log_to_file(undefined, undefined, "db-error", arguments);
 }
 const remove_out_date_files = () => {
   fs.readdir(log_file_dir, (err, files) => {
@@ -63,19 +63,19 @@ function get_date(d) {
 ///class///////////////////////////////////////
 class performance_timer {
   constructor(function_info) {
-    if (debug_mode === 0) return;
+    if (debug_mode < 2) return;
     this.start_time = process.uptime();
-    this.checkpoint = [`performance timer -${function_info}- time unit - seconds`];
+    this.checkpoint = [`performance timer -${function_info.name}- time unit - seconds`];
   }
   add_tick(tick_name) {
-    if (debug_mode === 0) return;
+    if (debug_mode < 2) return;
     this.checkpoint.push({
       name: tick_name,
       time: (process.uptime() - this.start_time)
     })
   }
   done() {
-    if (debug_mode === 0) return;
+    if (debug_mode < 2) return;
     this.add_tick("ending");
     console.log(this.checkpoint);
   }

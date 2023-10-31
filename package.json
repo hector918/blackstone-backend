@@ -6,7 +6,6 @@
   "scripts": {
     "test": "jest --detectOpenHandles",
     "server": "npx nodemon --ext js server"
-    
   },
   "author": "",
   "license": "ISC",

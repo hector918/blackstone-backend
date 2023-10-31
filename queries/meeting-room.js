@@ -27,7 +27,7 @@ const search_form_template = () => {
 }
 /////helper///////////////////////////////////////////
 async function genenal_query_procedure(task) {
-  const pt = new performance_timer(`event - ${task.name}`);
+  const pt = new performance_timer(`event - ${task}`);
   //draw an connection from the pool
   const connection = await db.connect();
   try {
