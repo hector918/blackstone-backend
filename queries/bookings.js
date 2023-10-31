@@ -10,7 +10,7 @@ const booking_template_to_save = () => {
     "start_date": input_filter.start_date_filter,
     "end_date": input_filter.end_date_filter,
     "attendees": input_filter.email_list_only_filter,
-    "host": input_filter.auth0_sid_filter,
+    "host": input_filter.auth0_sub_filter,
     "host_email": input_filter.email_only_filter,
     "meeting_room_id": input_filter.positive_int_only_filter,
     "timestamp": input_filter.string_filter

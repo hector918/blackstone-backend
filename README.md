@@ -19,6 +19,10 @@
 3. **Logging and Performance Monitoring:** Includes error logging and request logging to files, along with performance timers, making debugging and optimization easier. It can also automatically clean outdated log files.
 4. **Responsive Design:** The user interface can automatically adapt to both mobile and desktop environments.
 
+### Synk application Security check result
+
+![Snyk application Security check result](image.png)
+
 ## Deployment Guide
 
 1. Register an Auth0 account.
@@ -44,10 +48,6 @@
 5. Update the HTTPS certificate and key under `\ssl`.
 6. Run `npm i`.
 7. Start the server using `npm run server` or `node server.js`.
-
-### Synk application Security check result
-
-![Snyk application Security check result](image.png)
 
 ### API
 

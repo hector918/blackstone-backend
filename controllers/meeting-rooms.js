@@ -37,7 +37,7 @@ meeting_rooms.post('/', async (req, res) => {
     }
     //if all good, insert to db
     const user_profile = req.oidc.user;
-    const ret = await create_new_meeting_room({ name, capacity, floor, manager: user_profile.sid, manager_email: user_profile.email });
+    const ret = await create_new_meeting_room({ name, capacity, floor, manager: user_profile.sub, manager_email: user_profile.email });
     if (ret.error) {
       res.json({
         error: ret.error.message, detail: {

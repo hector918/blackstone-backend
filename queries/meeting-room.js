@@ -8,7 +8,7 @@ const meeting_room_template_to_save = () => {
     "name": input_filter.english_letter_space_number_only_filter,
     "capacity": input_filter.positive_int_only_filter,
     "floor": input_filter.int_only_filter,
-    "manager": input_filter.auth0_sid_filter,
+    "manager": input_filter.auth0_sub_filter,
     "manager_email": input_filter.email_only_filter
   }
 }

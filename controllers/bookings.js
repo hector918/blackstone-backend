@@ -50,13 +50,13 @@ bookings.post('/', async (req, res) => {
       //it ends here, if some value not vaild
       return;
     }
-    const { sid, email } = req.oidc.user;
+    const { sub, email } = req.oidc.user;
     const ret = await book_an_room({
       meeting_name: meetingName,
       start_date: startDate,
       end_date: endDate,
       attendees,
-      host: sid,
+      host: sub,
       host_email: email,
       meeting_room_id: meetingRoomId
     });

@@ -35,8 +35,8 @@ async function get_user_profile(req, res) {
     }
     //return user profile, if that is an new user, user_profile.from_db will be undefined
     let user_profile = req?.oidc?.user;
-    console.log(req.oidc)
-    user_profile.from_db = await db_user.get_user_info_by_email(req.oidc.user.email);
+    user_profile.from_db = await db_user.get_user_info_by_sub(req.oidc.user.sub);
+    //user_profile.from_db = await db_user.get_user_info_by_email(req.oidc.user.email);
     res.json({ payload: { user_profile } });
     //update user status to db
     await db_user.register_user_status(user_profile);

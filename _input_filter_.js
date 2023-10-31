@@ -81,6 +81,13 @@ function operater_filter(op) {
   }
 }
 
+function auth0_sub_filter(sub) {
+  var pattern = /^[0-9a-zA-Z-|]+$/;
+  var match = sub.match(pattern);
+  if (match) {
+    return match[0];
+  } else return "";
+}
 function auth0_sid_filter(sid) {
   var pattern = /^[0-9a-zA-Z-]+$/;
   var match = sid.match(pattern);
@@ -121,6 +128,7 @@ module.exports = {
   email_list_only_tester,
   email_list_only_filter,
   auth0_sid_filter,
+  auth0_sub_filter,
   operater_filter,
   filter_val
 }

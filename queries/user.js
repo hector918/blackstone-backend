@@ -9,7 +9,7 @@ const user_template_to_save = () => {
     "email": input_filter.email_only_filter,
     "last_seen": input_filter.string_filter,
     "sid": input_filter.auth0_sid_filter,
-    "sub": input_filter.string_filter,
+    "sub": input_filter.auth0_sub_filter,
   }
 }
 const user_template_to_show = () => {
@@ -45,16 +45,14 @@ const register_user_status = async (profile) => {
     }
     Object.keys(user_template).join(",");
     Object.keys(user_template).join("],$[")
-    /**
-      const old_sql = `INSERT INTO ${user_table_name} (${Object.keys(user_template).join(",")})
-        VALUES ($[${Object.keys(user_template).join("],$[")}])
-        ON CONFLICT (sid) DO UPDATE SET
-        last_seen = $[last_seen] RETURNING ${user_template_to_show().join(",")};` 
-     */
+
+    const sql = `INSERT INTO ${user_table_name} (${Object.keys(user_template).join(",")})
+      VALUES ($[${Object.keys(user_template).join("],$[")}])
+      ON CONFLICT (sub) DO UPDATE SET
+      last_seen = $[last_seen] RETURNING ${user_template_to_show().join(",")};`
+
     //insert or update
-    const user = await connection.oneOrNone(`INSERT INTO ${user_table_name} (${Object.keys(user_template).join(",")})
-    VALUES ($[${Object.keys(user_template).join("],$[")}])
-    RETURNING ${user_template_to_show().join(",")};`, clean_profile);
+    const user = await connection.oneOrNone(sql, clean_profile);
     return user;
   })
   return ret;
@@ -66,9 +64,9 @@ const set_first_user_as_admin = async (id = 1) => {
   })
 }
 
-const get_user_info_by_sid = async (sid) => {
+const get_user_info_by_sub = async (sub) => {
   return await genenal_query_procedure(async connection => {
-    return await connection.oneOrNone(`SELECT ${user_template_to_show().join(",")} FROM ${user_table_name} WHERE sid = $[sid] AND available = 0`, { sid });
+    return await connection.oneOrNone(`SELECT ${user_template_to_show().join(",")} FROM ${user_table_name} WHERE sub = $[sub] AND available = 0`, { sub });
   })
 }
 
@@ -80,4 +78,4 @@ const get_user_info_by_email = async (email) => {
   })
 }
 ///////////////////////////////////////////
-module.exports = { register_user_status, set_first_user_as_admin, get_user_info_by_sid, get_user_info_by_email }
+module.exports = { register_user_status, set_first_user_as_admin, get_user_info_by_sub, get_user_info_by_email }
