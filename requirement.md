@@ -1,48 +1,48 @@
-# Meeting Room Booking Web App
+# Frontend Takehome Coding Challenge
 
-## Tech Stack
+Coding challenge where you build a Meeting Room Booking App client that interacts with a RESTful API using React.
 
-- Node.js
-- Express
-- React
-- Postgresql
-- Bulma
-- Auth0
-- Oracle Cloud
-- Cloudflare
+## Prerequisutes
 
-## Highlights
+- Knowledge of Javascript/Typescript and React
 
-1. **User Authentication:** Utilize Auth0 for user authorization, allowing users to log in using Google, Apple, Microsoft, and GitHub accounts.
-2. **Security:** All user inputs are validated and filtered, providing a high level of security.
-3. **Logging and Performance Monitoring:** Includes error logging and request logging to files, along with performance timers, making debugging and optimization easier. It can also automatically clean outdated log files.
-4. **Responsive Design:** The user interface can automatically adapt to both mobile and desktop environments.
+## Getting Started
 
-## Deployment Guide
+1. Create a Database.
+   - You may use any type of db.
+2. Create a backend api service App.
+   - You may use any language.
+   - Complete your api service application according to the Technical requirements below
+3. Create a new React App.
+   - You may use `create-react-app`
+   - Complete your client application according to the Technical requirements below
 
-1. Register an Auth0 account.
-2. Deploy `/db/schema.txt` to a PostgreSQL server.
-3. Clone the backend repo to the VPS.
-4. Create a `.env` file with the following format:
+## Technical Requirements
 
-```
-   HTTPS_PORT=
-   HTTP_PORT=
-   PG_HOST=
-   PG_PORT=
-   PG_DB=
-   PG_USER=
-   PG_PASSWORD=
-   SINGLE_USER_MODE=false
-   AUTH_SECRET=
-   AUTH0_BASEURL=
-   AUTH0_CLIENTID=
-   AUTH0_ISSUERBASEURL=
-```
+Create a Meeting Room Booking application. Users are able to:
 
-5. Update the HTTPS certificate and key under `\ssl`.
-6. Run `npm i`.
-7. Start the server using `npm run server` or `node server.js`.
+#### Room management:
+
+- View all meeting rooms
+- Create a meeting room
+- View room bookings
+
+#### Booking management:
+
+- View all bookings
+- Book a meeting room
+- Cancel booking
+- Find available rooms (optional extra challenge)
+
+**Notes**:
+
+- You may use any 3rd-party libraries or packages for functionality or styling
+  We recomment you use something like Bootstrap or Material UI or others to style your app.
+
+### DB
+
+Create a database with 2 tables: MeetingRoom and Booking
+The tables should have Identity columns for the Ids and any necessary columns based on requirements and payloads below.
 
 ### API
 
@@ -59,6 +59,12 @@ Create a RESTFul API service with the below endpoints that read and write to the
 | `POST`   | `/api/bookings`                   | Create a booking for a meeting room<br><em>All fields are required except attendees</em><br><em>Validates that room is available to book</em> | { <br>&nbsp;&nbsp;&nbsp;&nbsp;"meetingName": "Scrum Standup",<br>&nbsp;&nbsp;&nbsp;&nbsp;"meetinRoomId": 2,<br>&nbsp;&nbsp;&nbsp;&nbsp;"startDate": "2022-03-23T17:00:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"endDate": "2022-03-23T17:30:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"attendees": "jdoe@email.com, bdylan@email.com"<br> } |
 | `DELETE` | `/api/bookings/:id`               | Cancel a booking by id                                                                                                                        | n/a                                                                                                                                                                                                                                                                                                                                |
 | `POST`   | `/api/meeting-rooms/available`    | **Extra challenge:** <br>Retrieve available rooms by search criteria<br><em>startDate and endDate are required</em>                           | { <br>&nbsp;&nbsp;&nbsp;&nbsp;"startDate": "2022-03-23T17:00:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"endDate": "2022-03-23T17:30:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"floor": 22,<br>&nbsp;&nbsp;&nbsp;&nbsp;"capacity": 3<br> }                                                                                                    |
+
+### Wireframes
+
+Your application doesn't have to look exactly as the wireframes below, however it should have all the main components, accomplish all the functionality and be visually pleasing.
+
+- Web Wireframes can be found [here](./BX-Room-Booking-App-Wireframes.pdf)
 
 ### App Pages/Views
 
@@ -93,3 +99,12 @@ Displays a list of all **future** bookings for all meeting rooms and when you cl
 #### Single Booking `/bookings/:id`
 
 Displays the details of the booking and a button to cancel it. Clicking Cancel should prompt user to confirm that they want to cancel booking. If they choose Yes it should cancel booking and if they choose No it should do nothing. Show a success message upon successful booking cancelation and an error message otherwise.
+
+## Submission Guidelines
+
+- We think this challenge would take ~7 hours to complete, so allocate your time appropriately.
+- You must submit your solution no later than **Monday, May 31st at 11:59pm.**
+- Include a README.md file with instructions on how to run your project.
+- Submit your code compressed in a zip file using the [submission form](https://docs.google.com/forms/d/e/1FAIpQLSeY0nBqtXTV06b2CmAreHLJzVHlG0cQHUx9g1RKPYer0hNVVQ/viewform?usp=sf_link)
+  - Make sure to remove your `node_modules/` folder before compressing
+- For any questions reach out to @Alejo in the [Pursuit Core Workspace](https://pursuit-core.slack.com/)
