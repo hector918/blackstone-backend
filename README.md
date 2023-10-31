@@ -10,6 +10,7 @@
 - Auth0
 - Oracle Cloud
 - Cloudflare
+- Snyk
 
 ## Highlights
 
@@ -46,7 +47,7 @@
 
 ### Synk application Security check result
 
-![Synk application Security check result](image.png)
+![Snyk application Security check result](image.png)
 
 ### API
 

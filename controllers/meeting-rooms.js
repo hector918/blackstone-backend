@@ -86,8 +86,17 @@ meeting_rooms.get('/:id/bookings', async (req, res) => {
 })
 
 meeting_rooms.post('/available', async (req, res) => {
-  //search available room
-  const { startDate, endDate, capacity, capacityOp, floor, floorOp } = req.body;
+  //search available room by post
+  search_for_available_rooms_helper(req, res, req.body);
+});
+meeting_rooms.get('/available', async (req, res) => {
+  //search available room by query string
+  search_for_available_rooms_helper(req, res, req.params);
+});
+//helper//////////////////////////////////////
+async function search_for_available_rooms_helper(req, res, form) {
+  const { startDate, endDate, capacity, capacityOp, floor, floorOp } = form;
+
   await req.general_procedure(req, res, async () => {
     //validation
     const form = {};
@@ -109,8 +118,6 @@ meeting_rooms.post('/available', async (req, res) => {
       res.json({ payload: ret });
     }
   })
-});
-
-
+}
 //////////////////////////////////////////////
 module.exports = meeting_rooms;
