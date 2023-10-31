@@ -8,11 +8,12 @@ const user_template_to_save = () => {
     "name": input_filter.english_name_only_filter,
     "email": input_filter.email_only_filter,
     "last_seen": input_filter.string_filter,
-    "sid": input_filter.auth0_sid_filter
+    "sid": input_filter.auth0_sid_filter,
+    "sub": input_filter.string_filter,
   }
 }
 const user_template_to_show = () => {
-  return ["name", "email", "sid", "power"];
+  return ["name", "email", "sid", "power", "sub"];
 }
 /////helper///////////////////////////////////////////
 async function genenal_query_procedure(task) {
@@ -32,7 +33,6 @@ async function genenal_query_procedure(task) {
     if (connection) connection.done();
   }
 }
-
 ///export/////////////////////////////////
 const register_user_status = async (profile) => {
   profile['last_seen'] = new Date().toLocaleString();
@@ -43,12 +43,18 @@ const register_user_status = async (profile) => {
     for (let key in user_template) {
       clean_profile[key] = input_filter.filter_val(profile[key], user_template[key]);
     }
-
+    Object.keys(user_template).join(",");
+    Object.keys(user_template).join("],$[")
+    /**
+      const old_sql = `INSERT INTO ${user_table_name} (${Object.keys(user_template).join(",")})
+        VALUES ($[${Object.keys(user_template).join("],$[")}])
+        ON CONFLICT (sid) DO UPDATE SET
+        last_seen = $[last_seen] RETURNING ${user_template_to_show().join(",")};` 
+     */
     //insert or update
-    const user = await connection.oneOrNone(`INSERT INTO ${user_table_name} (name, email, sid, last_seen)
-    VALUES ($[name], $[email], $[sid], $[last_seen])
-    ON CONFLICT (sid) DO UPDATE SET
-    last_seen = $[last_seen] RETURNING ${user_template_to_show().join(",")};`, clean_profile);
+    const user = await connection.oneOrNone(`INSERT INTO ${user_table_name} (${Object.keys(user_template).join(",")})
+    VALUES ($[${Object.keys(user_template).join("],$[")}])
+    RETURNING ${user_template_to_show().join(",")};`, clean_profile);
     return user;
   })
   return ret;
@@ -65,5 +71,13 @@ const get_user_info_by_sid = async (sid) => {
     return await connection.oneOrNone(`SELECT ${user_template_to_show().join(",")} FROM ${user_table_name} WHERE sid = $[sid] AND available = 0`, { sid });
   })
 }
+
+const get_user_info_by_email = async (email) => {
+  const clean_email = input_filter.filter_val(email, input_filter.email_list_only_filter);
+  return await genenal_query_procedure(async connection => {
+    if (clean_email === "") throw new Error(`illegal email ${email}`);
+    return await connection.oneOrNone(`SELECT ${user_template_to_show().join(",")} FROM ${user_table_name} WHERE email = $[email] AND available = 0`, { email: clean_email });
+  })
+}
 ///////////////////////////////////////////
-module.exports = { register_user_status, set_first_user_as_admin, get_user_info_by_sid }
+module.exports = { register_user_status, set_first_user_as_admin, get_user_info_by_sid, get_user_info_by_email }

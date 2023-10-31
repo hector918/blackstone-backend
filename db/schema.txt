@@ -53,6 +53,7 @@ CREATE TABLE "blackstone-user" (
     power integer DEFAULT 5,
     available integer DEFAULT 0,
     last_seen timestamp without time zone,
+    sub text,
     sid text
 );
 

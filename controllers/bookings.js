@@ -27,7 +27,6 @@ bookings.get("/:id", async (req, res) => {
     const ret = { ...bookings[0], roomInfo: rooms[0] };
     res.json({ payload: ret });
   })
-
 })
 
 bookings.post('/', async (req, res) => {
@@ -82,5 +81,4 @@ bookings.delete("/:id", async (req, res) => {
   res.json({ payload: ret.id });
 })
 //////////////////////////////////////////////
-
 module.exports = bookings;
