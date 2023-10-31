@@ -1,5 +1,8 @@
 const fs = require('fs');
-var debug_mode = 1;
+var debug_mode = 2;
+//0 = log to console
+//1 += log to file
+//2 += console log performance_timer
 const log_file_dir = __dirname + "/logs/";
 const log_file_expire_limit = 7;// unit day
 const time_lapse_key_name = "log_start_time";

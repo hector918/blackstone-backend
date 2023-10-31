@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const { auth } = require('express-openid-connect');
 const cors = require("cors");
-const { verify_auth, get_user_profile } = require('./_auth_');
+const { verify_auth } = require('./_auth_');
 const { log_error, log, set_log_mode, time_lapse_key_name, log_to_file } = require('./_log_');
 const error_code = require('./_error-code_');
 const variable = require('./_variable_');
@@ -16,8 +16,8 @@ const config = {
   auth0Logout: true,
   secret: process.env.AUTH_SECRET,
   baseURL: process.env.AUTH0_BASEURL,
-  clientID: 'n4AbKZtipsZqrYoJCgeNNfaTpdZmwECK',
-  issuerBaseURL: 'https://dev-2rc87pi2gm2ieibf.us.auth0.com'
+  clientID: process.env.AUTH0_CLIENTID,
+  issuerBaseURL: process.env.AUTH0_ISSUERBASEURL
 };
 //middle ware//////////////////////////////////
 app.use(cors({ credentials: true, origin: true }));
@@ -42,10 +42,6 @@ app.use('/api/meeting-rooms', verify_auth, require('./controllers/meeting-rooms'
 app.use('/api/bookings', verify_auth, require('./controllers/bookings'));
 //base route
 //route explain: /login, /logout, /callback are taken by auth0//
-app.use('/callback', async (req, res, next) => {
-  console.log("in callback", req.oidc);
-  next();
-})
 app.get('/set_first_user_as_admin', async (req, res) => {
   await general_procedure(req, res, async () => {
     const ret = await user.set_first_user_as_admin();

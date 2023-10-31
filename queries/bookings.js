@@ -92,8 +92,10 @@ const get_future_bookings_by_meeting_room_id = async (meeting_room_id) => {
 const get_all_future_bookings_on_all_rooms = async () => {
   return await genenal_query_procedure(async (connection, pt) => {
     return await connection.tx(async t => {
+      pt.add_tick("getting future bookings");
       const bookings = await get_future_bookings_with_room_id_t(undefined, connection);
       const room_list = bookings.map(el => `'${el.meeting_room_id}'`);
+      pt.add_tick("getting future bookings room info");
       const rooms = await get_meeting_rooms_by_ids_t(room_list, t);
       return { bookings, rooms };
     })
@@ -104,8 +106,10 @@ const get_booking_by_ids = async (ids) => {
   return await genenal_query_procedure(async (connection, pt) => {
     return await connection.tx(async t => {
       const clean_ids = ids.map(n => input_filter.filter_val(n, input_filter.positive_int_only_filter));
+      pt.add_tick("geting booking by ids");
       const bookings = await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE id in (${clean_ids.join(',')}) AND status = 0;`);
       const room_list = bookings.map(el => `'${el.meeting_room_id}'`);
+      pt.add_tick('collecting room info with booking room id');
       const rooms = await get_meeting_rooms_by_ids_t(room_list, t);
       return { bookings, rooms };
     })
@@ -113,7 +117,6 @@ const get_booking_by_ids = async (ids) => {
   })
 }
 async function mark_booking_delete(booking_id, user) {
-  console.log("['sid']", user)
   return await genenal_query_procedure(async (connection, pt) => {
     const clean_booking_id = input_filter.filter_val(booking_id, input_filter.positive_int_only_filter);
 

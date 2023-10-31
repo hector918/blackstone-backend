@@ -78,7 +78,6 @@ bookings.delete("/:id", async (req, res) => {
   //cancel a booking by id
   const { id: booking_id } = req.params;
   const ret = await mark_booking_delete(booking_id, req.oidc.user);
-  console.log(ret);
   if (ret.error) throw new Error(res.error);
   res.json({ payload: ret.id });
 })
