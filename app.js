@@ -59,7 +59,7 @@ app.get('/is_auth', async (req, res) => {
     } else {
       req.log("in is auth path, unhandle event");
     }
-    //return user profile
+    //return user profile, if that is an new user, user_profile.from_db will be undefined
     let user_profile = req?.oidc?.user;
     user_profile.from_db = await db_user.get_user_info_by_sid(req.oidc.user.sid);
     res.json({ payload: { user_profile } });

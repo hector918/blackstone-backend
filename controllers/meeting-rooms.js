@@ -68,13 +68,15 @@ meeting_rooms.get('/:id', async (req, res) => {
 });
 
 meeting_rooms.get('/:id/bookings', async (req, res) => {
+  //future bookings by meeting room id
   const { id: meeting_room_id } = req.params;
   await req.general_procedure(req, res, async () => {
-    //
+    //vaildation
     const vaildation = input_filter.positive_int_only_tester(meeting_room_id);
     if (vaildation.ret === false) {
       res.json({ error: vaildation.explain });
     } else {
+      //go db  
       const ret = await booking.get_future_bookings_by_meeting_room_id(meeting_room_id);
       if (ret.error !== undefined) throw new Error(error.message);
       res.json({ payload: ret });
@@ -99,6 +101,7 @@ meeting_rooms.post('/available', async (req, res) => {
       form['floor'] = floor;
       form['floorOp'] = input_filter.operater_filter(floorOp);
     }
+    //db op
     const ret = await search_available_room(form);
     if (ret.error) {
       throw new Error(ret.error.message);

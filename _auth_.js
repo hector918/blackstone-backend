@@ -11,8 +11,8 @@ async function verify_auth(req, res, next) {
   } else if (req.path === "/login" || req.path === "/callback" || req.path === "/logout") {
     next();
   } else {
-    req.log("unknow", req.oidc, req.path)
-    // return redirect_to_login(req, res);
+    req.log("unknown", req.oidc, req.path)
+    return code_403(req, res);
   }
 }
 async function redirect_to_login(req, res) {
