@@ -44,6 +44,10 @@
 6. Run `npm i`.
 7. Start the server using `npm run server` or `node server.js`.
 
+### Synk application Security check result
+
+![Synk application Security check result](image.png)
+
 ### API
 
 Create a RESTFul API service with the below endpoints that read and write to the database. It should accept and return JSON payloads.
