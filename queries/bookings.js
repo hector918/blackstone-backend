@@ -10,7 +10,7 @@ const booking_template_to_save = () => {
     "start_date": input_filter.start_date_filter,
     "end_date": input_filter.end_date_filter,
     "attendees": input_filter.email_list_only_filter,
-    "host": input_filter.english_letter_space_number_only_filter,
+    "host": input_filter.auth0_sid_filter,
     "host_email": input_filter.email_only_filter,
     "meeting_room_id": input_filter.positive_int_only_filter,
     "timestamp": input_filter.string_filter
@@ -116,7 +116,10 @@ async function mark_booking_delete(booking_id, user) {
   console.log("['sid']", user)
   return await genenal_query_procedure(async (connection, pt) => {
     const clean_booking_id = input_filter.filter_val(booking_id, input_filter.positive_int_only_filter);
-    return await connection.oneOrNone(`UPDATE ${bookings_table_name} SET status = 2 WHERE id = $[booking_id] AND host = $[sid] AND (SELECT power FROM ${user_table_name} WHERE sid = $[sid]) = 0 RETURNING ${booking_template_to_show().join(',')};`, { "booking_id": clean_booking_id, "sid": user.sid });
+
+    const sql = `UPDATE ${bookings_table_name} SET status = 2 WHERE id = $[booking_id] AND host_email = $[email] OR (SELECT MIN(power) FROM ${user_table_name} WHERE email = $[email]) = 0 RETURNING ${booking_template_to_show().join(',')};`;
+
+    return await connection.oneOrNone(sql, { "booking_id": clean_booking_id, "email": user.email });
   })
 }
 /////////////////////////////

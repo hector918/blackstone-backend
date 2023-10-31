@@ -80,6 +80,15 @@ function operater_filter(op) {
     default: return undefined;
   }
 }
+
+function auth0_sid_filter(sid) {
+  var pattern = /^[0-9a-zA-Z-]+$/;
+  var match = sid.match(pattern);
+
+  if (match) {
+    return match[0];
+  } else return "";
+}
 const filter_val = (val, filter) => {
   if (val === undefined) throw new Error("The input value does not match our map.")
   if (filter) return filter(val);
@@ -111,6 +120,7 @@ module.exports = {
   end_date_filter,
   email_list_only_tester,
   email_list_only_filter,
+  auth0_sid_filter,
   operater_filter,
   filter_val
 }

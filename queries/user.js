@@ -8,7 +8,7 @@ const user_template_to_save = () => {
     "name": input_filter.english_name_only_filter,
     "email": input_filter.email_only_filter,
     "last_seen": input_filter.string_filter,
-    "sid": input_filter.string_filter
+    "sid": input_filter.auth0_sid_filter
   }
 }
 const user_template_to_show = () => {

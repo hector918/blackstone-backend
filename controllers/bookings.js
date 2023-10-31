@@ -17,7 +17,6 @@ bookings.get('/', async (req, res) => {
 bookings.get("/:id", async (req, res) => {
   //retrieve a booking by id
   const { id } = req.params;
-  console.log(id)
   await req.general_procedure(req, res, async () => {
     //validation
     const validation = input_filter.positive_int_only_tester(id);
@@ -79,6 +78,7 @@ bookings.delete("/:id", async (req, res) => {
   //cancel a booking by id
   const { id: booking_id } = req.params;
   const ret = await mark_booking_delete(booking_id, req.oidc.user);
+  console.log(ret);
   if (ret.error) throw new Error(res.error);
   res.json({ payload: ret.id });
 })
