@@ -25,7 +25,7 @@ const code404 = () => {
         align-items: center;
         height: 100vh;
         margin: 0;
-        font-family: Impact, sans-serif;
+        font-family: monospace, sans-serif;
         background-color: #485fc7;
         color: #fff;
         text-align: center;
