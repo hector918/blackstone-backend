@@ -21,7 +21,7 @@
 
 ### Synk application Security check result
 
-![Snyk application Security check result](image.png)
+![Snyk application Security check result](synk.png)
 
 ## Deployment Guide
 
@@ -48,6 +48,11 @@
 5. Update the HTTPS certificate and key under `\ssl`.
 6. Run `npm i`.
 7. Start the server using `npm run server` or `node server.js`.
+
+### Repository
+
+- Backend repo [https://github.com/hector918/blackstone-backend](https://github.com/hector918/blackstone-backend).
+- Frontend repo [https://github.com/hector918/meeting-booking](https://github.com/hector918/meeting-booking).
 
 ### API
 

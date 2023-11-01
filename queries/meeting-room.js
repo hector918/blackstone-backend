@@ -125,7 +125,8 @@ const search_available_room = async (form) => {
     }
     pt.add_tick("start search");
     //search
-    return await connection.manyOrNone(`SELECT ${meeting_room_template_to_show().map(el => meeting_room_table_name + "." + el).join(",")} FROM ${meeting_room_table_name} ${key_word["dateSearch"]} WHERE ${meeting_room_table_name}.available = 0 ${key_word['capacity']} ${key_word['floor']} ${key_word['bkey']} GROUP BY ${meeting_room_table_name}.id ${key_word['groupId']};`, clean_form);
+    const sql = `SELECT ${meeting_room_template_to_show().map(el => meeting_room_table_name + "." + el).join(",")} FROM ${meeting_room_table_name} ${key_word["dateSearch"]} WHERE ${meeting_room_table_name}.available = 0 ${key_word['capacity']} ${key_word['floor']} ${key_word['bkey']} GROUP BY ${meeting_room_table_name}.id ${key_word['groupId']};`;
+    return await connection.manyOrNone(sql, clean_form);
   })
 }
 /////////////////////////////
