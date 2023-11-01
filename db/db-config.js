@@ -12,7 +12,7 @@ var connectionOptions = {
 };
 try {
   var db = pgp(connectionOptions);
-
+  if (db) db.query("SET TIME ZONE 'America/New_York'");
 } catch (error) {
   console.error("database connection error", error);
 }
