@@ -24,6 +24,7 @@ async function code_403(req, res) {
 
 async function get_user_profile(req, res) {
   await req.general_procedure(req, res, async () => {
+    console.log(variable.single_user_mode)
     if (variable.single_user_mode === false) {
       //if not in single user mode, needs to check user login status
       if (req.oidc.isAuthenticated() === false) throw new Error(401);
