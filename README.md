@@ -69,37 +69,3 @@ Create a RESTFul API service with the below endpoints that read and write to the
 | `POST`   | `/api/bookings`                   | Create a booking for a meeting room<br><em>All fields are required except attendees</em><br><em>Validates that room is available to book</em> | { <br>&nbsp;&nbsp;&nbsp;&nbsp;"meetingName": "Scrum Standup",<br>&nbsp;&nbsp;&nbsp;&nbsp;"meetinRoomId": 2,<br>&nbsp;&nbsp;&nbsp;&nbsp;"startDate": "2022-03-23T17:00:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"endDate": "2022-03-23T17:30:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"attendees": "jdoe@email.com, bdylan@email.com"<br> } |
 | `DELETE` | `/api/bookings/:id`               | Cancel a booking by id                                                                                                                        | n/a                                                                                                                                                                                                                                                                                                                                |
 | `POST`   | `/api/meeting-rooms/available`    | **Extra challenge:** <br>Retrieve available rooms by search criteria<br><em>startDate and endDate are required</em>                           | { <br>&nbsp;&nbsp;&nbsp;&nbsp;"startDate": "2022-03-23T17:00:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"endDate": "2022-03-23T17:30:00.000Z",<br>&nbsp;&nbsp;&nbsp;&nbsp;"floor": 22,<br>&nbsp;&nbsp;&nbsp;&nbsp;"capacity": 3<br> }                                                                                                    |
-
-### App Pages/Views
-
-Your Room Booking App should have the following pages (and be displayed at their respective browser url).
-
-#### Home `/`
-
-Displays a nav bar or navigation menu that would take the user to **Meeting Rooms**, **Bookings** and **New Room** pages. This navbar should be visible on all pages/views.
-
-Below the navbar display a list of all meeting rooms.
-
-When you click in one of the meeting rooms of the list it should take the user to the meeting room page.
-
-**Extra challenge:** Above list, display a form to look for available rooms. The form must include Start Date, End Date, Floor and Capacity input fields and a Find button. The Floor and Capacity inputs should be optional and all others required. The result should filter list of meeting rooms to display only the available ones.
-
-#### Single Meeting Room `/meetingrooms/:id`
-
-Displays the details of the meeting room and below it all its **future** bookings.
-
-Display a form to book the meeting room. The form must include Meeting Name, Start Date, End Date and Attendees input fields and a Submit button. The Attendees input should be optional and all others required. Show a success message upon successful booking creation and an error message otherwise.
-
-Should also display a list of all existing **future** bookings and when you click in one of the bookings of the list it should take the user to that booking's page/view.
-
-#### New Meeting Room `/meetingrooms/new`
-
-Display a form where a user (admin) can create a meeting room. The form must include Name, Capacity and Floor input fields and Submit button. All inputs are required. Show a success message upon successful meeting room creation and an error message otherwise.
-
-#### Bookings `/bookings`
-
-Displays a list of all **future** bookings for all meeting rooms and when you click in one of the bookings of the list it should take the user to that booking's page/view.
-
-#### Single Booking `/bookings/:id`
-
-Displays the details of the booking and a button to cancel it. Clicking Cancel should prompt user to confirm that they want to cancel booking. If they choose Yes it should cancel booking and if they choose No it should do nothing. Show a success message upon successful booking cancelation and an error message otherwise.
