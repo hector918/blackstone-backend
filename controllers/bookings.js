@@ -84,8 +84,10 @@ bookings.delete("/:id", async (req, res) => {
     //validation
     const validation = input_filter.positive_int_only_tester(booking_id);
     if (validation.ret === false) throw new Error(validation.explain);
+    console.log("deleting", booking_id)
     //mark delete to db
     const ret = await mark_booking_delete(booking_id, req.oidc.user);
+    console.log(ret);
     if (ret.error) throw new Error(res.error);
     res.json({ payload: ret.id });
   })
