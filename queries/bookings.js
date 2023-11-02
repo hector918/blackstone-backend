@@ -124,7 +124,7 @@ async function mark_booking_delete(booking_id, user) {
   return await genenal_query_procedure(async (connection, pt) => {
     const clean_booking_id = input_filter.filter_val(booking_id, input_filter.positive_int_only_filter);
 
-    const sql = `UPDATE ${bookings_table_name} SET status = 2 WHERE id = $[booking_id] AND host_email = $[email] OR (SELECT MIN(power) FROM ${user_table_name} WHERE email = $[email]) = 0 RETURNING ${booking_template_to_show().join(',')};`;
+    const sql = `UPDATE ${bookings_table_name} SET status = 2 WHERE id = $[booking_id] AND (host_email = $[email] OR (SELECT MIN(power) FROM ${user_table_name} WHERE email = $[email]) = 0) RETURNING ${booking_template_to_show().join(',')};`;
 
     return await connection.oneOrNone(sql, { "booking_id": clean_booking_id, "email": user.email });
   })
