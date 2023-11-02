@@ -8,7 +8,6 @@ bookings.get('/', async (req, res) => {
   //list all future booking
   req.general_procedure(req, res, async () => {
     const ret = await get_all_future_bookings_on_all_rooms();
-    console.log(ret);
     if (ret.error) {
       res.json({ error: error.message });
     } else {

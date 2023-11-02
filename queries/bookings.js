@@ -46,7 +46,6 @@ async function get_future_bookings_with_room_id_t(meeting_room_id = undefined, t
   return await t.manyOrNone(`SELECT ${booking_template_to_show().join(",")} FROM ${bookings_table_name} WHERE ${where} start_date > CURRENT_TIMESTAMP AND end_date > CURRENT_TIMESTAMP AND status = 0 ORDER BY start_date;`, { meeting_room_id });
 }
 
-
 /////export///////////////////////////////////
 const book_an_room = async (form) => {
   form.timestamp = new Date().toLocaleString();
