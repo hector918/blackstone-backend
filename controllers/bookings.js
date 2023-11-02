@@ -79,10 +79,17 @@ bookings.post('/', async (req, res) => {
 
 bookings.delete("/:id", async (req, res) => {
   //cancel a booking by id
-  const { id: booking_id } = req.params;
-  const ret = await mark_booking_delete(booking_id, req.oidc.user);
-  if (ret.error) throw new Error(res.error);
-  res.json({ payload: ret.id });
+  req.general_procedure(req, res, async () => {
+    const { id: booking_id } = req.params;
+    //validation
+    const validation = input_filter.positive_int_only_tester(booking_id);
+    if (validation.ret === false) throw new Error(validation.explain);
+    //mark delete to db
+    const ret = await mark_booking_delete(booking_id, req.oidc.user);
+    if (ret.error) throw new Error(res.error);
+    res.json({ payload: ret.id });
+  })
+
 })
 //////////////////////////////////////////////
 module.exports = bookings;
