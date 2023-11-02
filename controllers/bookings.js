@@ -6,12 +6,16 @@ const { book_an_room, get_all_future_bookings_on_all_rooms, get_booking_by_ids, 
 //////////////////////////////////////////////
 bookings.get('/', async (req, res) => {
   //list all future booking
-  const ret = await get_all_future_bookings_on_all_rooms();
-  if (ret.error) {
-    res.json({ error: error.message });
-  } else {
-    res.json({ payload: ret });
-  }
+  req.general_procedure(req, res, async () => {
+    const ret = await get_all_future_bookings_on_all_rooms();
+    console.log(ret);
+    if (ret.error) {
+      res.json({ error: error.message });
+    } else {
+      res.json({ payload: ret });
+    }
+  })
+
 })
 
 bookings.get("/:id", async (req, res) => {

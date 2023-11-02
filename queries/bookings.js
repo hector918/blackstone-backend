@@ -95,8 +95,12 @@ const get_all_future_bookings_on_all_rooms = async () => {
       pt.add_tick("getting future bookings");
       const bookings = await get_future_bookings_with_room_id_t(undefined, connection);
       const room_list = bookings.map(el => `'${el.meeting_room_id}'`);
-      pt.add_tick("getting future bookings room info");
-      const rooms = await get_meeting_rooms_by_ids_t(room_list, t);
+      let rooms = undefined
+      if (room_list.length > 0) {
+        pt.add_tick("getting future bookings room info");
+        rooms = await get_meeting_rooms_by_ids_t(room_list, t);
+      }
+
       return { bookings, rooms };
     })
   })
