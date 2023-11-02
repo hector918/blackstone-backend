@@ -12,7 +12,7 @@ var connectionOptions = {
 };
 try {
   var db = pgp(connectionOptions);
-  if (db) db.query("SET TIME ZONE 'US/Eastern';");
+  if (db) db.oneOrNone("SET TIME ZONE 'US/Eastern';SELECT current_setting('TIMEZONE') AS current_timezone;").then(res => console.log("database timezone", res));
 } catch (error) {
   console.error("database connection error", error);
 }

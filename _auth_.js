@@ -1,5 +1,6 @@
 const variable = require('./_variable_');
 const db_user = require('./queries/user');
+console.log("single user mode", variable.single_user_mode);
 ////////////////////////////////////////////////
 async function verify_auth(req, res, next) {
   //if single user mode, skip the session check
@@ -24,7 +25,6 @@ async function code_403(req, res) {
 
 async function get_user_profile(req, res) {
   await req.general_procedure(req, res, async () => {
-    console.log(variable.single_user_mode)
     if (variable.single_user_mode === false) {
       //if not in single user mode, needs to check user login status
       if (req.oidc.isAuthenticated() === false) throw new Error(401);

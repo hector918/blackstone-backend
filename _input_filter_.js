@@ -5,7 +5,7 @@ function english_letter_space_number_only_filter(s, size = 100) {
 function english_letter_space_number_only_tester(s) {
   return {
     ret: /^[A-Za-z0-9\s]{1,100}$/.test(s),
-    explain: "only accept english letter, number and space."
+    explain: "This field only accepts letters, numbers and spaces."
   };
 }
 function int_only_tester(n) {
