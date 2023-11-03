@@ -91,14 +91,24 @@ bookings.delete("/:id", async (req, res) => {
 
 })
 bookings.patch('/:id', async (req, res) => {
-  const { attendees } = req.body;
+  const { attendees, meetingName } = req.body;
   const { id } = req.params;
   await req.general_procedure(req, res, async () => {
     //validation
-    const validation = input_filter.email_list_only_tester(attendees);
-    if (validation.ret === false) throw new Error(validation.explain);
+    const validation = {
+      meetingName: input_filter.filter_val(meetingName, input_filter.english_letter_space_number_only_tester),
+      attendees: input_filter.email_list_only_tester(attendees),
+    }
+    for (let key in validation) if (validation[key].ret === false) {
+      res.json({
+        error: "input not vaild.",
+        detail: validation
+      });
+      //it ends here, if some value not vaild
+      return;
+    }
     //send to db
-    const ret = await update_booking_by_id(id, { attendees }, req.oidc.user);
+    const ret = await update_booking_by_id(id, { attendees, "meeting_name": meetingName }, req.oidc.user);
     if (ret.error) throw new Error(ret.error);
     res.json({ payload: ret });
   })

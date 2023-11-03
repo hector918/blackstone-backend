@@ -137,7 +137,8 @@ async function update_booking_by_id(booking_id, form, user) {
     const clean_form = {};
     const update_set = [];
     for (let key in booking_template) if (form[key] !== undefined) {
-      if (key !== "attendees") continue;
+
+      if (key !== "attendees" && key != "meeting_name") continue;
       if (key === "attendees") {
         clean_form[key] = { email_list: input_filter.filter_val(form[key], booking_template[key]) }
       } else {
