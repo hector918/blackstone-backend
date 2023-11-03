@@ -2,7 +2,7 @@ const express = require("express");
 const bookings = express.Router();
 const input_filter = require('../_input_filter_');
 const variable = require('../_variable_');
-const { book_an_room, get_all_future_bookings_on_all_rooms, get_booking_by_ids, mark_booking_delete } = require('../queries/bookings');
+const { book_an_room, get_all_future_bookings_on_all_rooms, get_booking_by_ids, mark_booking_delete, update_booking_by_id } = require('../queries/bookings');
 //////////////////////////////////////////////
 bookings.get('/', async (req, res) => {
   //list all future booking
@@ -89,6 +89,19 @@ bookings.delete("/:id", async (req, res) => {
     res.json({ payload: ret.id });
   })
 
+})
+bookings.patch('/:id', async (req, res) => {
+  const { attendees } = req.body;
+  const { id } = req.params;
+  await req.general_procedure(req, res, async () => {
+    //validation
+    const validation = input_filter.email_list_only_tester(attendees);
+    if (validation.ret === false) throw new Error(validation.explain);
+    //send to db
+    const ret = await update_booking_by_id(id, { attendees }, req.oidc.user);
+    if (ret.error) throw new Error(ret.error);
+    res.json({ payload: ret });
+  })
 })
 //////////////////////////////////////////////
 module.exports = bookings;
