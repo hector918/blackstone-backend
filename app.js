@@ -8,7 +8,7 @@ const { log_error, log, set_log_mode, time_lapse_key_name, log_to_file } = requi
 const error_code = require('./_error-code_');
 const variable = require('./_variable_');
 ///auth0//////////////////////////////////////
-set_log_mode(1);
+set_log_mode(2);
 //auth0 config
 const config = {
   authRequired: false,
